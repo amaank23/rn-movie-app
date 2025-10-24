@@ -6,9 +6,11 @@ import { Image, StyleSheet, TextInput, View } from "react-native";
 type Props = {
   placeholder: string;
   onPress?: () => void;
+  value?: string;
+  onChangeText?: (text: string) => void;
 };
 
-const SearchBar = ({ onPress, placeholder }: Props) => {
+const SearchBar = ({ onPress, placeholder, value, onChangeText }: Props) => {
   return (
     <View style={styles.container}>
       <Image
@@ -20,10 +22,11 @@ const SearchBar = ({ onPress, placeholder }: Props) => {
       <TextInput
         onPress={onPress}
         placeholder={placeholder}
-        value=""
+        value={value}
         onChange={() => {}}
         placeholderTextColor={"#a8b5db"}
         style={styles.textInput}
+        onChangeText={onChangeText}
       />
     </View>
   );
