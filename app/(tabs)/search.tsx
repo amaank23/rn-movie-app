@@ -3,6 +3,7 @@ import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { fetchMovies } from "@/services/api";
+import { updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 import { colors } from "@/utils/style";
 import React, { useEffect } from "react";
@@ -26,6 +27,7 @@ const Search = () => {
   } = useFetch(() => fetchMovies({ query: searchTerm }), false);
 
   useEffect(() => {
+    // updateSearchCount(searchTerm, { id: 0 } as any);
     const func = async () => {
       if (searchTerm.trim()) {
         await loadMovies();
@@ -36,6 +38,12 @@ const Search = () => {
     const timeout = setTimeout(func, 500);
     return () => clearTimeout(timeout);
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (searchTerm.trim() && movies?.length > 0) {
+      updateSearchCount(searchTerm, movies[0]);
+    }
+  }, [movies]);
   return (
     <View style={styles.container}>
       <Image source={images.bg} style={styles.image} resizeMode="cover" />
