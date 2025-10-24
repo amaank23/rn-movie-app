@@ -1,8 +1,10 @@
 import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
+import TrendingCard from "@/components/TrendingCard";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { fetchMovies } from "@/services/api";
+import { getTrendingMovies } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 import { colors } from "@/utils/style";
 import { useRouter } from "expo-router";
@@ -19,6 +21,13 @@ import {
 export default function Index() {
   const router = useRouter();
   const {
+    data: trendingMovies,
+    loading: trendingMoviesLoading,
+    error: trendingMoviesError,
+    fetchData: refetchTrendingMovies,
+    reset: resetTrendingMovies,
+  } = useFetch(getTrendingMovies);
+  const {
     data: movies,
     loading: moviesLoading,
     error: moviesError,
@@ -32,20 +41,49 @@ export default function Index() {
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
         <Image source={icons.logo} style={styles.logo} />
-        {moviesLoading ? (
+        {moviesLoading || trendingMoviesLoading ? (
           <ActivityIndicator
             size={"large"}
             color={"#0000FF"}
             style={{ marginTop: 40, alignSelf: "center" }}
           />
-        ) : moviesError ? (
-          <Text>Error: {moviesError?.message}</Text>
+        ) : moviesError || trendingMoviesError ? (
+          <Text>
+            Error: {moviesError?.message || trendingMoviesError?.message}
+          </Text>
         ) : (
           <View style={styles.mainView}>
             <SearchBar
               onPress={() => router.push("/search")}
               placeholder={"Search for a movie"}
             />
+
+            {trendingMovies && (
+              <View style={{ marginTop: 40 }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: "white",
+                    fontWeight: "bold",
+                    marginBottom: 12,
+                  }}
+                >
+                  Trending Movies
+                </Text>
+
+                <FlatList
+                  style={{ marginBottom: 16, marginTop: 12 }}
+                  data={trendingMovies}
+                  renderItem={({ item, index }) => (
+                    <TrendingCard movie={item} index={index} />
+                  )}
+                  keyExtractor={(item) => item.movie_id.toString()}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  ItemSeparatorComponent={() => <View style={{ width: 16 }} />}
+                />
+              </View>
+            )}
 
             <>
               <Text
